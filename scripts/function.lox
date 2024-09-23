@@ -1,0 +1,12 @@
+fun main() {
+    example("world")
+}
+
+fun example(name) {
+    print "Hello, "
+    print name
+    print "!\n"
+}
+
+// Start program
+main()

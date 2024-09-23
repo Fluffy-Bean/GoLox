@@ -41,7 +41,7 @@ const (
 	Fun
 	For
 	If
-	Nah
+	Null
 	Or
 	Print
 	Return
@@ -53,6 +53,25 @@ const (
 
 	EOF
 )
+
+var Tokens = map[string]int{
+	"and":    And,
+	"class":  Class,
+	"else":   Else,
+	"false":  False,
+	"fun":    Fun,
+	"for":    For,
+	"if":     If,
+	"null":   Null,
+	"or":     Or,
+	"print":  Print,
+	"return": Return,
+	"super":  Super,
+	"this":   This,
+	"true":   True,
+	"var":    Var,
+	"while":  While,
+}
 
 type Token struct {
 	Type    int
