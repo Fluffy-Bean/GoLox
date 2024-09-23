@@ -32,10 +32,10 @@ func (s *Scanner) scanToken() {
 	c := s.advance()
 	switch c {
 	case '(':
-		s.addToken(LeftBrace)
+		s.addToken(LeftParen)
 		break
 	case ')':
-		s.addToken(RightBrace)
+		s.addToken(RightParen)
 		break
 	case '{':
 		s.addToken(LeftBrace)
