@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strconv"
+)
+
 type Scanner struct {
 	source  string
 	tokens  []Token
@@ -93,6 +98,23 @@ func (s *Scanner) scanToken() {
 			s.addToken(Slash)
 		}
 		break
+	case "\"":
+		for s.peek() != "\"" && !s.isAtEnd() {
+			if s.peek() == "\n" {
+				s.line += 1
+			}
+			s.advance()
+		}
+
+		if s.isAtEnd() {
+			fuck(s.line, "Undetermined string")
+			return
+		}
+
+		s.advance()                                                    // close "
+		s.addTokenWithLiteral(String, s.source[s.start+1:s.current-1]) // +- to remove ""
+
+		break
 	case " ":
 	case "\t":
 	case "\r":
@@ -102,7 +124,28 @@ func (s *Scanner) scanToken() {
 		s.line += 1
 		break
 	default:
-		fuck(s.line, "Unexpected Char.")
+		if s.isDigit(c) {
+			for s.isDigit(s.peek()) {
+				s.advance()
+			}
+
+			if s.peek() == "." && s.isDigit(s.peekAfter()) {
+				s.advance() // eated .
+
+				for s.isDigit(s.peek()) {
+					s.advance()
+				}
+			}
+
+			number, err := strconv.ParseFloat(s.source[s.start:s.current], 64)
+			if err != nil {
+				fuck(s.line, "Undetermined int")
+			}
+
+			s.addTokenWithLiteral(Number, fmt.Sprintf("%f", number)) // convert back to string, lol
+		} else {
+			fuck(s.line, "Unexpected Character")
+		}
 		break
 	}
 }
@@ -120,6 +163,13 @@ func (s *Scanner) peek() string {
 	return string(s.source[s.current])
 }
 
+func (s *Scanner) peekAfter() string {
+	if s.current+1 >= len(s.source) {
+		return ""
+	}
+	return string(s.source[s.current+1])
+}
+
 func (s *Scanner) match(expected string) bool {
 	if s.isAtEnd() {
 		return false
@@ -131,6 +181,16 @@ func (s *Scanner) match(expected string) bool {
 	return true
 }
 
+func (s *Scanner) isDigit(val string) bool {
+	// Lazy way of doing thia, Atoi could work, but unsure if it has any funkiness to it.....
+	for _, number := range "0123456789" {
+		if val == string(number) {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Scanner) addToken(token int) {
 	s.tokens = append(s.tokens, Token{
 		Type:    token,
@@ -140,6 +200,15 @@ func (s *Scanner) addToken(token int) {
 	})
 	//fmt.Printf("[%d %d %d] ", s.line, s.current, s.start)
 	//fmt.Println(s.tokens[len(s.tokens)-1])
+}
+
+func (s *Scanner) addTokenWithLiteral(token int, value string) {
+	s.tokens = append(s.tokens, Token{
+		Type:    token,
+		Lexeme:  s.source[s.start:s.current],
+		Literal: value,
+		Line:    s.line,
+	})
 }
 
 func (s *Scanner) isAtEnd() bool {

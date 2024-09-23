@@ -57,10 +57,10 @@ const (
 type Token struct {
 	Type    int
 	Lexeme  string
-	Literal string
+	Literal string // JS moment
 	Line    int
 }
 
 func (t Token) String() string {
-	return fmt.Sprintf("%d %s %s", t.Type, t.Lexeme, t.Literal)
+	return fmt.Sprintf("[%d] %d %s %s", t.Line, t.Type, t.Lexeme, t.Literal)
 }
